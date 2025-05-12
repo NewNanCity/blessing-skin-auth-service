@@ -1,0 +1,19 @@
+{
+  "name": "blessing-skin-oauth",
+  "title": "OAuth 服务",
+  "version": "0.1.0",
+  "description": "为第三方应用提供 OAuth 认证服务",
+  "author": "Ke Wang",
+  "url": "",
+  "namespace": "BlessingSkin\\OAuth",
+  "require": {
+    "blessing-skin-server": "^6"
+  },
+  "enchants": {
+    "config": "Configuration",
+    "icon": {
+      "fa": "key",
+      "bg": "primary"
+    }
+  }
+}

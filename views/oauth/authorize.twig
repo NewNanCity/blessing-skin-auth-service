@@ -1,0 +1,46 @@
+{% extends 'auth.base' %}
+
+{% block title %}{{ trans('BlessingSkin\\OAuth::oauth.authorize') }}{% endblock %}
+
+{% block content %}
+<div class="card card-primary">
+  <div class="card-header">
+    <h3 class="card-title">{{ trans('BlessingSkin\\OAuth::oauth.authorize') }}</h3>
+  </div>
+  <div class="card-body">
+    <div class="text-center mb-4">
+      <h4>{{ trans('BlessingSkin\\OAuth::oauth.authorization-request') }}</h4>
+      <p>{{ trans('BlessingSkin\\OAuth::oauth.client-requesting', {client: client.name}) }}</p>
+    </div>
+
+    <div class="alert alert-info">
+      <h5><i class="icon fas fa-info"></i> {{ trans('BlessingSkin\\OAuth::oauth.permissions-title') }}</h5>
+      <ul>
+        <li>{{ trans('BlessingSkin\\OAuth::oauth.permission-profile') }}</li>
+        <li>{{ trans('BlessingSkin\\OAuth::oauth.permission-email') }}</li>
+      </ul>
+    </div>
+
+    <form method="post" action="{{ url('oauth/authorize') }}">
+      <input type="hidden" name="client_id" value="{{ request.client_id }}">
+      <input type="hidden" name="redirect_uri" value="{{ request.redirect_uri }}">
+      <input type="hidden" name="response_type" value="{{ request.response_type }}">
+      <input type="hidden" name="scope" value="{{ request.scope }}">
+      <input type="hidden" name="state" value="{{ request.state }}">
+      
+      <div class="row">
+        <div class="col-6">
+          <button type="submit" name="action" value="deny" class="btn btn-block btn-secondary">
+            {{ trans('BlessingSkin\\OAuth::oauth.deny') }}
+          </button>
+        </div>
+        <div class="col-6">
+          <button type="submit" name="action" value="approve" class="btn btn-block btn-primary">
+            {{ trans('BlessingSkin\\OAuth::oauth.approve') }}
+          </button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+{% endblock %}

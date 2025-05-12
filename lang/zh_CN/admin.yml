@@ -1,0 +1,16 @@
+clients: OAuth 应用管理
+create-client: 创建应用
+edit-client: 编辑应用
+client-name: 应用名称
+client-id: 客户端 ID
+client-secret: 客户端密钥
+redirect-uri: 重定向 URI
+redirect-uri-hint: 用户授权后将被重定向到此 URI
+description: 应用描述
+description-hint: 简要描述此应用的用途
+created-at: 创建时间
+no-clients: 暂无应用
+client-created: 应用创建成功
+client-updated: 应用更新成功
+client-deleted: 应用已删除
+confirm-delete: 确定要删除此应用吗？

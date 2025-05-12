@@ -1,0 +1,17 @@
+authorize: 授权请求
+authorization-request: 授权请求
+client-requesting: 应用 "{client}" 请求访问您的账户
+permissions-title: 此应用将获得以下权限：
+permission-profile: 访问您的基本资料信息
+permission-email: 访问您的电子邮件地址
+deny: 拒绝
+approve: 授权
+access-denied: 用户拒绝了授权请求
+client-not-found: 未找到指定的应用
+redirect-uri-mismatch: 重定向 URI 不匹配
+invalid-client: 无效的客户端凭据
+invalid-auth-code: 无效的授权码
+invalid-refresh-token: 无效的刷新令牌
+missing-token: 缺少访问令牌
+invalid-token: 无效的访问令牌
+user-not-found: 未找到用户

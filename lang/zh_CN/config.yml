@@ -1,0 +1,9 @@
+title: OAuth 服务配置
+token-lifetime: 访问令牌有效期
+token-lifetime-hint: 访问令牌的有效期，单位为分钟
+refresh-token-lifetime: 刷新令牌有效期
+refresh-token-lifetime-hint: 刷新令牌的有效期，单位为天
+minutes: 分钟
+days: 天
+invalid-token-lifetime: 访问令牌有效期必须是大于 0 的数字
+invalid-refresh-token-lifetime: 刷新令牌有效期必须是大于 0 的数字

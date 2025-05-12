@@ -1,0 +1,8 @@
+authorizations: Application Authorizations
+client-name: Application Name
+description: Application Description
+authorized-at: Authorized At
+no-authorizations: No authorized applications yet
+revoke: Revoke
+authorization-revoked: Authorization revoked
+confirm-revoke: Are you sure you want to revoke this authorization? After revocation, this application will no longer be able to access your account information.

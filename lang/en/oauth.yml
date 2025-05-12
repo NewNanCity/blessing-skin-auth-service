@@ -1,0 +1,17 @@
+authorize: Authorization Request
+authorization-request: Authorization Request
+client-requesting: The application "{client}" is requesting access to your account
+permissions-title: "This application will be able to:"
+permission-profile: Access your basic profile information
+permission-email: Access your email address
+deny: Deny
+approve: Authorize
+access-denied: User denied the authorization request
+client-not-found: Client not found
+redirect-uri-mismatch: Redirect URI mismatch
+invalid-client: Invalid client credentials
+invalid-auth-code: Invalid authorization code
+invalid-refresh-token: Invalid refresh token
+missing-token: Missing access token
+invalid-token: Invalid access token
+user-not-found: User not found

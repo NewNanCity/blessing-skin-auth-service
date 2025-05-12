@@ -1,0 +1,73 @@
+{% extends 'user.base' %}
+
+{% block title %}{{ trans('BlessingSkin\\OAuth::user.authorizations') }}{% endblock %}
+
+{% block content %}
+<div class="card">
+  <div class="card-header">
+    <h3 class="card-title">{{ trans('BlessingSkin\\OAuth::user.authorizations') }}</h3>
+  </div>
+  <div class="card-body table-responsive p-0">
+    <table class="table table-hover">
+      <thead>
+        <tr>
+          <th>{{ trans('BlessingSkin\\OAuth::user.client-name') }}</th>
+          <th>{{ trans('BlessingSkin\\OAuth::user.description') }}</th>
+          <th>{{ trans('BlessingSkin\\OAuth::user.authorized-at') }}</th>
+          <th>{{ trans('general.operations') }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if authorizations|length > 0 %}
+          {% for auth in authorizations %}
+            <tr>
+              <td>{{ auth.client.name }}</td>
+              <td>{{ auth.client.description }}</td>
+              <td>{{ auth.created_at }}</td>
+              <td>
+                <button class="btn btn-danger btn-sm revoke-authorization" data-id="{{ auth.id }}">
+                  {{ trans('BlessingSkin\\OAuth::user.revoke') }}
+                </button>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr>
+            <td colspan="4" class="text-center">{{ trans('BlessingSkin\\OAuth::user.no-authorizations') }}</td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+  $(document).ready(function () {
+    // 撤销授权
+    $('.revoke-authorization').click(function () {
+      const id = $(this).data('id');
+      
+      if (confirm('{{ trans('BlessingSkin\\OAuth::user.confirm-revoke') }}')) {
+        $.ajax({
+          url: '{{ url('user/oauth/authorizations') }}/' + id,
+          type: 'DELETE',
+          dataType: 'json',
+          success: function (response) {
+            if (response.code === 0) {
+              toastr.success(response.message);
+              setTimeout(function () {
+                window.location.reload();
+              }, 1000);
+            } else {
+              toastr.error(response.message);
+            }
+          },
+          error: function () {
+            toastr.error('{{ trans('general.network-error') }}');
+          }
+        });
+      }
+    });
+  });
+</script>
+{% endblock %}

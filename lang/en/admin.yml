@@ -1,0 +1,16 @@
+clients: OAuth Applications Management
+create-client: Create Application
+edit-client: Edit Application
+client-name: Application Name
+client-id: Client ID
+client-secret: Client Secret
+redirect-uri: Redirect URI
+redirect-uri-hint: Users will be redirected to this URI after authorization
+description: Description
+description-hint: Briefly describe the purpose of this application
+created-at: Created At
+no-clients: No applications yet
+client-created: Application created successfully
+client-updated: Application updated successfully
+client-deleted: Application deleted
+confirm-delete: Are you sure you want to delete this application?

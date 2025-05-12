@@ -1,0 +1,9 @@
+title: OAuth Service Configuration
+token-lifetime: Access Token Lifetime
+token-lifetime-hint: The lifetime of access tokens in minutes
+refresh-token-lifetime: Refresh Token Lifetime
+refresh-token-lifetime-hint: The lifetime of refresh tokens in days
+minutes: minutes
+days: days
+invalid-token-lifetime: Access token lifetime must be a number greater than 0
+invalid-refresh-token-lifetime: Refresh token lifetime must be a number greater than 0

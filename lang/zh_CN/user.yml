@@ -1,0 +1,8 @@
+authorizations: 应用授权管理
+client-name: 应用名称
+description: 应用描述
+authorized-at: 授权时间
+no-authorizations: 暂无授权应用
+revoke: 撤销授权
+authorization-revoked: 授权已撤销
+confirm-revoke: 确定要撤销此应用的授权吗？撤销后，此应用将无法再访问您的账户信息。
