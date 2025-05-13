@@ -12,21 +12,28 @@ use Illuminate\Contracts\Events\Dispatcher;
 return function (Dispatcher $events, Filter $filter, $plugin) {
     // 注册用户中心菜单项
     Hook::addMenuItem('user', 0, [
-        'title' => 'BlessingSkin\\OAuth::general.user-menu',
+        'title' => 'BlessingSkin\\AuthService::general.user-menu',
         'link'  => '/user/oauth/authorizations',
         'icon'  => 'fa-key',
     ]);
 
     // 注册管理面板菜单项
     Hook::addMenuItem('admin', 0, [
-        'title' => 'BlessingSkin\\OAuth::general.admin-menu',
+        'title' => 'BlessingSkin\\AuthService::general.admin-menu',
         'link'  => '/admin/oauth/clients',
         'icon'  => 'fa-key',
     ]);
 
     // 注册路由
     Hook::addRoute(function () {
-        Route::namespace('BlessingSkin\\OAuth\\Controllers')
+        Route::namespace('BlessingSkin\\AuthService\\Controllers')
             ->group(__DIR__.'/routes.php');
     });
+
+    // 注册前端资源
+    Hook::addScriptFileToPage($plugin->assets('clients.js'), ['admin/oauth/clients']);
+    Hook::addScriptFileToPage($plugin->assets('authorizations.js'), ['user/oauth/authorizations']);
+
+    // 注册前端事件监听器
+    Hook::addScriptFileToPage($plugin->assets('config.js'), ['admin/oauth']);
 };

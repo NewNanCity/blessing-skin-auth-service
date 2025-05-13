@@ -1,23 +1,36 @@
 {% extends 'auth.base' %}
 
-{% block title %}{{ trans('BlessingSkin\\OAuth::oauth.authorize') }}{% endblock %}
+{% block title %}{{ trans('BlessingSkin\\AuthService::oauth.authorize') }}{% endblock %}
 
 {% block content %}
 <div class="card card-primary">
   <div class="card-header">
-    <h3 class="card-title">{{ trans('BlessingSkin\\OAuth::oauth.authorize') }}</h3>
+    <h3 class="card-title">{{ trans('BlessingSkin\\AuthService::oauth.authorize') }}</h3>
   </div>
   <div class="card-body">
     <div class="text-center mb-4">
-      <h4>{{ trans('BlessingSkin\\OAuth::oauth.authorization-request') }}</h4>
-      <p>{{ trans('BlessingSkin\\OAuth::oauth.client-requesting', {client: client.name}) }}</p>
+      <h4>{{ trans('BlessingSkin\\AuthService::oauth.authorization-request') }}</h4>
+      <p>{{ trans('BlessingSkin\\AuthService::oauth.client-requesting', {client: client.name}) }}</p>
     </div>
 
     <div class="alert alert-info">
-      <h5><i class="icon fas fa-info"></i> {{ trans('BlessingSkin\\OAuth::oauth.permissions-title') }}</h5>
+      <h5><i class="icon fas fa-info"></i> {{ trans('BlessingSkin\\AuthService::oauth.permissions-title') }}</h5>
       <ul>
-        <li>{{ trans('BlessingSkin\\OAuth::oauth.permission-profile') }}</li>
-        <li>{{ trans('BlessingSkin\\OAuth::oauth.permission-email') }}</li>
+        {% if request.scope is defined and request.scope is not empty %}
+          {% set scopes = request.scope|split(' ') %}
+          {% if 'openid' in scopes %}
+            <li>{{ trans('BlessingSkin\\AuthService::oauth.permission-openid') }}</li>
+          {% endif %}
+          {% if 'profile' in scopes %}
+            <li>{{ trans('BlessingSkin\\AuthService::oauth.permission-profile') }}</li>
+          {% endif %}
+          {% if 'email' in scopes %}
+            <li>{{ trans('BlessingSkin\\AuthService::oauth.permission-email') }}</li>
+          {% endif %}
+        {% else %}
+          <li>{{ trans('BlessingSkin\\AuthService::oauth.permission-profile') }}</li>
+          <li>{{ trans('BlessingSkin\\AuthService::oauth.permission-email') }}</li>
+        {% endif %}
       </ul>
     </div>
 
@@ -27,16 +40,19 @@
       <input type="hidden" name="response_type" value="{{ request.response_type }}">
       <input type="hidden" name="scope" value="{{ request.scope }}">
       <input type="hidden" name="state" value="{{ request.state }}">
-      
+      {% if request.nonce is defined and request.nonce is not empty %}
+        <input type="hidden" name="nonce" value="{{ request.nonce }}">
+      {% endif %}
+
       <div class="row">
         <div class="col-6">
           <button type="submit" name="action" value="deny" class="btn btn-block btn-secondary">
-            {{ trans('BlessingSkin\\OAuth::oauth.deny') }}
+            {{ trans('BlessingSkin\\AuthService::oauth.deny') }}
           </button>
         </div>
         <div class="col-6">
           <button type="submit" name="action" value="approve" class="btn btn-block btn-primary">
-            {{ trans('BlessingSkin\\OAuth::oauth.approve') }}
+            {{ trans('BlessingSkin\\AuthService::oauth.approve') }}
           </button>
         </div>
       </div>

@@ -1,14 +1,14 @@
 {% extends 'admin.base' %}
 
-{% block title %}{{ trans('BlessingSkin\\OAuth::admin.clients') }}{% endblock %}
+{% block title %}{{ trans('BlessingSkin\\AuthService::admin.clients') }}{% endblock %}
 
 {% block content %}
 <div class="card">
   <div class="card-header">
-    <h3 class="card-title">{{ trans('BlessingSkin\\OAuth::admin.clients') }}</h3>
+    <h3 class="card-title">{{ trans('BlessingSkin\\AuthService::admin.clients') }}</h3>
     <div class="card-tools">
       <button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#create-client-modal">
-        {{ trans('BlessingSkin\\OAuth::admin.create-client') }}
+        {{ trans('BlessingSkin\\AuthService::admin.create-client') }}
       </button>
     </div>
   </div>
@@ -16,12 +16,12 @@
     <table class="table table-hover">
       <thead>
         <tr>
-          <th>{{ trans('BlessingSkin\\OAuth::admin.client-name') }}</th>
-          <th>{{ trans('BlessingSkin\\OAuth::admin.client-id') }}</th>
-          <th>{{ trans('BlessingSkin\\OAuth::admin.client-secret') }}</th>
-          <th>{{ trans('BlessingSkin\\OAuth::admin.redirect-uri') }}</th>
-          <th>{{ trans('BlessingSkin\\OAuth::admin.description') }}</th>
-          <th>{{ trans('BlessingSkin\\OAuth::admin.created-at') }}</th>
+          <th>{{ trans('BlessingSkin\\AuthService::admin.client-name') }}</th>
+          <th>{{ trans('BlessingSkin\\AuthService::admin.client-id') }}</th>
+          <th>{{ trans('BlessingSkin\\AuthService::admin.client-secret') }}</th>
+          <th>{{ trans('BlessingSkin\\AuthService::admin.redirect-uri') }}</th>
+          <th>{{ trans('BlessingSkin\\AuthService::admin.description') }}</th>
+          <th>{{ trans('BlessingSkin\\AuthService::admin.created-at') }}</th>
           <th>{{ trans('general.operations') }}</th>
         </tr>
       </thead>
@@ -56,7 +56,7 @@
           {% endfor %}
         {% else %}
           <tr>
-            <td colspan="7" class="text-center">{{ trans('BlessingSkin\\OAuth::admin.no-clients') }}</td>
+            <td colspan="7" class="text-center">{{ trans('BlessingSkin\\AuthService::admin.no-clients') }}</td>
           </tr>
         {% endif %}
       </tbody>
@@ -69,7 +69,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="create-client-modal-label">{{ trans('BlessingSkin\\OAuth::admin.create-client') }}</h5>
+        <h5 class="modal-title" id="create-client-modal-label">{{ trans('BlessingSkin\\AuthService::admin.create-client') }}</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -77,18 +77,18 @@
       <div class="modal-body">
         <form id="create-client-form">
           <div class="form-group">
-            <label for="client-name">{{ trans('BlessingSkin\\OAuth::admin.client-name') }}</label>
+            <label for="client-name">{{ trans('BlessingSkin\\AuthService::admin.client-name') }}</label>
             <input type="text" class="form-control" id="client-name" name="name" required>
           </div>
           <div class="form-group">
-            <label for="redirect-uri">{{ trans('BlessingSkin\\OAuth::admin.redirect-uri') }}</label>
+            <label for="redirect-uri">{{ trans('BlessingSkin\\AuthService::admin.redirect-uri') }}</label>
             <input type="url" class="form-control" id="redirect-uri" name="redirect_uri" required>
-            <small class="form-text text-muted">{{ trans('BlessingSkin\\OAuth::admin.redirect-uri-hint') }}</small>
+            <small class="form-text text-muted">{{ trans('BlessingSkin\\AuthService::admin.redirect-uri-hint') }}</small>
           </div>
           <div class="form-group">
-            <label for="description">{{ trans('BlessingSkin\\OAuth::admin.description') }}</label>
+            <label for="description">{{ trans('BlessingSkin\\AuthService::admin.description') }}</label>
             <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-            <small class="form-text text-muted">{{ trans('BlessingSkin\\OAuth::admin.description-hint') }}</small>
+            <small class="form-text text-muted">{{ trans('BlessingSkin\\AuthService::admin.description-hint') }}</small>
           </div>
         </form>
       </div>
@@ -105,7 +105,7 @@
   <div class="modal-dialog" role="document">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title" id="edit-client-modal-label">{{ trans('BlessingSkin\\OAuth::admin.edit-client') }}</h5>
+        <h5 class="modal-title" id="edit-client-modal-label">{{ trans('BlessingSkin\\AuthService::admin.edit-client') }}</h5>
         <button type="button" class="close" data-dismiss="modal" aria-label="Close">
           <span aria-hidden="true">&times;</span>
         </button>
@@ -114,18 +114,18 @@
         <form id="edit-client-form">
           <input type="hidden" id="edit-client-id">
           <div class="form-group">
-            <label for="edit-client-name">{{ trans('BlessingSkin\\OAuth::admin.client-name') }}</label>
+            <label for="edit-client-name">{{ trans('BlessingSkin\\AuthService::admin.client-name') }}</label>
             <input type="text" class="form-control" id="edit-client-name" name="name" required>
           </div>
           <div class="form-group">
-            <label for="edit-redirect-uri">{{ trans('BlessingSkin\\OAuth::admin.redirect-uri') }}</label>
+            <label for="edit-redirect-uri">{{ trans('BlessingSkin\\AuthService::admin.redirect-uri') }}</label>
             <input type="url" class="form-control" id="edit-redirect-uri" name="redirect_uri" required>
-            <small class="form-text text-muted">{{ trans('BlessingSkin\\OAuth::admin.redirect-uri-hint') }}</small>
+            <small class="form-text text-muted">{{ trans('BlessingSkin\\AuthService::admin.redirect-uri-hint') }}</small>
           </div>
           <div class="form-group">
-            <label for="edit-description">{{ trans('BlessingSkin\\OAuth::admin.description') }}</label>
+            <label for="edit-description">{{ trans('BlessingSkin\\AuthService::admin.description') }}</label>
             <textarea class="form-control" id="edit-description" name="description" rows="3"></textarea>
-            <small class="form-text text-muted">{{ trans('BlessingSkin\\OAuth::admin.description-hint') }}</small>
+            <small class="form-text text-muted">{{ trans('BlessingSkin\\AuthService::admin.description-hint') }}</small>
           </div>
         </form>
       </div>
@@ -137,113 +137,5 @@
   </div>
 </div>
 
-<script>
-  $(document).ready(function () {
-    // 切换密钥显示/隐藏
-    $('.toggle-secret').click(function () {
-      const field = $(this).closest('.input-group').find('.secret-field');
-      const icon = $(this).find('i');
-
-      if (field.attr('type') === 'password') {
-        field.attr('type', 'text');
-        icon.removeClass('fa-eye').addClass('fa-eye-slash');
-      } else {
-        field.attr('type', 'password');
-        icon.removeClass('fa-eye-slash').addClass('fa-eye');
-      }
-    });
-
-    // 创建客户端
-    $('#create-client-submit').click(function () {
-      const form = $('#create-client-form');
-
-      $.ajax({
-        url: '{{ url('admin/oauth/clients') }}',
-        type: 'POST',
-        data: form.serialize(),
-        dataType: 'json',
-        success: function (response) {
-          if (response.code === 0) {
-            toastr.success(response.message);
-            setTimeout(function () {
-              window.location.reload();
-            }, 1000);
-          } else {
-            toastr.error(response.message);
-          }
-        },
-        error: function () {
-          toastr.error('{{ trans('general.network-error') }}');
-        }
-      });
-    });
-
-    // 打开编辑模态框
-    $('.edit-client').click(function () {
-      const id = $(this).data('id');
-      const name = $(this).data('name');
-      const redirect = $(this).data('redirect');
-      const description = $(this).data('description');
-
-      $('#edit-client-id').val(id);
-      $('#edit-client-name').val(name);
-      $('#edit-redirect-uri').val(redirect);
-      $('#edit-description').val(description);
-
-      $('#edit-client-modal').modal('show');
-    });
-
-    // 编辑客户端
-    $('#edit-client-submit').click(function () {
-      const id = $('#edit-client-id').val();
-      const form = $('#edit-client-form');
-
-      $.ajax({
-        url: '{{ url('admin/oauth/clients') }}/' + id,
-        type: 'PUT',
-        data: form.serialize(),
-        dataType: 'json',
-        success: function (response) {
-          if (response.code === 0) {
-            toastr.success(response.message);
-            setTimeout(function () {
-              window.location.reload();
-            }, 1000);
-          } else {
-            toastr.error(response.message);
-          }
-        },
-        error: function () {
-          toastr.error('{{ trans('general.network-error') }}');
-        }
-      });
-    });
-
-    // 删除客户端
-    $('.delete-client').click(function () {
-      const id = $(this).data('id');
-
-      if (confirm('{{ trans('BlessingSkin\\OAuth::admin.confirm-delete') }}')) {
-        $.ajax({
-          url: '{{ url('admin/oauth/clients') }}/' + id,
-          type: 'DELETE',
-          dataType: 'json',
-          success: function (response) {
-            if (response.code === 0) {
-              toastr.success(response.message);
-              setTimeout(function () {
-                window.location.reload();
-              }, 1000);
-            } else {
-              toastr.error(response.message);
-            }
-          },
-          error: function () {
-            toastr.error('{{ trans('general.network-error') }}');
-          }
-        });
-      }
-    });
-  });
-</script>
+<!-- JavaScript文件在bootstrap.php中加载 -->
 {% endblock %}

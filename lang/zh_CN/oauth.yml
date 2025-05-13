@@ -4,6 +4,7 @@ client-requesting: 应用 "{client}" 请求访问您的账户
 permissions-title: 此应用将获得以下权限：
 permission-profile: 访问您的基本资料信息
 permission-email: 访问您的电子邮件地址
+permission-openid: 使用 OpenID Connect 验证您的身份
 deny: 拒绝
 approve: 授权
 access-denied: 用户拒绝了授权请求
@@ -15,3 +16,9 @@ invalid-refresh-token: 无效的刷新令牌
 missing-token: 缺少访问令牌
 invalid-token: 无效的访问令牌
 user-not-found: 未找到用户
+invalid-nonce: 无效的 nonce 参数
+missing-nonce: 缺少 nonce 参数
+invalid-scope: 无效的作用域
+missing-scope: 缺少作用域参数
+invalid-response-type: 无效的响应类型
+invalid-id-token: 无效的 ID 令牌

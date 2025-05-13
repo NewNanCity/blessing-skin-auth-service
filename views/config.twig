@@ -1,7 +1,36 @@
 {% extends 'admin.base' %}
 
-{% block title %}{{ trans('BlessingSkin\\OAuth::config.title') }}{% endblock %}
+{% block title %}{{ trans('BlessingSkin\\AuthService::config.title') }}{% endblock %}
 
 {% block content %}
-  {{ form|raw }}
+  <style>
+    textarea {
+      font-family: "SFMono-Regular", Consolas, "Liberation Mono", Menlo, Courier, monospace;
+    }
+  </style>
+
+  <div class="row">
+    <div class="col-md-6">
+      {{ forms.basic|raw }}
+      {{ forms.oidc|raw }}
+      {{ forms.jwt|raw }}
+    </div>
+    <div class="col-md-6">
+      <!-- OAuth API 信息卡片 -->
+      <div class="card card-success">
+        <div class="card-header">
+          <h3 class="card-title"><i class="fa fa-key"></i> OAuth API</h3>
+        </div>
+        <div class="card-body">
+          <p>{{ trans('BlessingSkin\\AuthService::config.url.oauth-label') }}<code>{{ url('oauth') }}</code></p>
+          <p>{{ trans('BlessingSkin\\AuthService::config.url.oidc-label') }}<code>{{ url('oauth/.well-known/openid-configuration') }}</code></p>
+          <p>{{ trans('BlessingSkin\\AuthService::config.url.saml-label') }}<code>{{ url('saml/metadata') }}</code></p>
+          <p>{{ trans('BlessingSkin\\AuthService::config.url.notice') }}</p>
+        </div>
+      </div>
+
+      {{ forms.saml|raw }}
+      {{ forms.saml_cert|raw }}
+    </div>
+  </div>
 {% endblock %}

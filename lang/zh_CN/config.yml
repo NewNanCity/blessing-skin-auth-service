@@ -1,9 +1,78 @@
 title: OAuth 服务配置
-token-lifetime: 访问令牌有效期
-token-lifetime-hint: 访问令牌的有效期，单位为分钟
-refresh-token-lifetime: 刷新令牌有效期
-refresh-token-lifetime-hint: 刷新令牌的有效期，单位为天
+
+# URL 信息
+url:
+  oauth-label: 'OAuth 服务 API 地址：'
+  oidc-label: 'OpenID Connect 配置地址：'
+  saml-label: 'SAML 元数据地址：'
+  notice: 请确保以上 URL 能够正常访问，并在配置客户端时使用正确的地址。
+
+# 基本配置
+basic:
+  title: 基本配置
+  token-lifetime: 访问令牌有效期
+  token-lifetime-hint: 访问令牌的有效期，单位为分钟
+  refresh-token-lifetime: 刷新令牌有效期
+  refresh-token-lifetime-hint: 刷新令牌的有效期，单位为天
+
+# OIDC配置
+oidc:
+  title: OpenID Connect 配置
+  id-token-lifetime: ID 令牌有效期
+  id-token-lifetime-hint: ID 令牌的有效期，单位为分钟
+  issuer: 颁发者 URL
+  issuer-hint: OpenID Connect 颁发者标识符，通常是您的站点 URL
+
+# JWT配置
+jwt:
+  title: JWT 密钥管理
+  generate-new-key: 生成新的 JWT 密钥
+  generate-new-key-hint: 生成新的 RSA 密钥对用于签名 JWT 令牌
+  cleanup-tokens: 清理过期和已撤销的令牌
+  cleanup-tokens-hint: 删除所有过期和已撤销的令牌记录，释放数据库空间
+  cleanup-details: 清理详情
+  tokens-cleaned: 已清理 {count} 条令牌记录
+
+# 通用
 minutes: 分钟
 days: 天
 invalid-token-lifetime: 访问令牌有效期必须是大于 0 的数字
 invalid-refresh-token-lifetime: 刷新令牌有效期必须是大于 0 的数字
+invalid-id-token-lifetime: ID 令牌有效期必须是大于 0 的数字
+key-generated: 新的 JWT 密钥对已生成
+
+# SAML 配置
+saml:
+  title: SAML 设置
+  enabled: 启用 SAML
+  enabled-hint: 启用 SAML 单点登录功能
+  entity-id: 服务提供者实体 ID
+  entity-id-hint: 服务提供者（SP）的实体 ID，通常是元数据 URL
+  idp-entity-id: 身份提供者实体 ID
+  idp-entity-id-hint: 身份提供者（IdP）的实体 ID
+  idp-sso-url: 身份提供者单点登录 URL
+  idp-sso-url-hint: 身份提供者（IdP）的单点登录服务 URL
+  idp-slo-url: 身份提供者单点登出 URL
+  idp-slo-url-hint: 身份提供者（IdP）的单点登出服务 URL
+  idp-x509cert: 身份提供者 X.509 证书
+  idp-x509cert-hint: 身份提供者（IdP）的 X.509 证书，用于验证 SAML 响应
+  nameid-format: 名称 ID 格式
+  nameid-format-hint: SAML 名称 ID 的格式
+  attr-email: 邮箱属性名
+  attr-email-hint: SAML 断言中包含用户邮箱的属性名
+  attr-name: 姓名属性名
+  attr-name-hint: SAML 断言中包含用户姓名的属性名
+  auto-register: 自动注册用户
+  auto-register-hint: 如果用户不存在，是否自动创建用户账号
+
+# SAML 证书
+saml-cert:
+  title: SAML 证书
+  x509cert: 服务提供者 X.509 证书
+  x509cert-hint: 服务提供者（SP）的 X.509 证书，用于签名 SAML 请求
+  private-key: 服务提供者私钥
+  private-key-hint: 服务提供者（SP）的私钥，用于签名 SAML 请求
+  generate: 生成 SAML 证书
+  generate-hint: 生成新的自签名证书用于 SAML
+
+saml-cert-generated: 新的 SAML 证书已生成

@@ -1,6 +1,6 @@
 <?php
 
-namespace BlessingSkin\OAuth\Controllers;
+namespace BlessingSkin\AuthService\Controllers;
 
 use App\Http\Controllers\Controller as BaseController;
 

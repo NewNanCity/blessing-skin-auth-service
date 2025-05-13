@@ -1,13 +1,13 @@
 <?php
 
-namespace BlessingSkin\OAuth;
+namespace BlessingSkin\AuthService;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
 
 /**
  * OAuth 用户授权模型
- * 
+ *
  * 此模型表示用户对 OAuth 客户端的授权
  * 当用户授权一个客户端时，会创建一条授权记录
  * 用户可以随时撤销授权

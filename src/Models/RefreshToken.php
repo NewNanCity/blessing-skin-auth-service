@@ -1,6 +1,6 @@
 <?php
 
-namespace BlessingSkin\OAuth\Models;
+namespace BlessingSkin\AuthService\Models;
 
 use Illuminate\Database\Eloquent\Model;
 

@@ -1,9 +1,10 @@
 <?php
 
-namespace BlessingSkin\OAuth\Controllers;
+namespace BlessingSkin\AuthService\Controllers;
 
-use BlessingSkin\OAuth\Client;
+use BlessingSkin\AuthService\Client;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 /**
  * OAuth 管理员控制器
@@ -25,7 +26,7 @@ class AdminController extends Controller
     {
         $clients = Client::all();
 
-        return view('BlessingSkin\\OAuth::admin.clients', [
+        return view('BlessingSkin\\AuthService::admin.clients', [
             'clients' => $clients
         ]);
     }
@@ -59,7 +60,7 @@ class AdminController extends Controller
 
         return response()->json([
             'code' => 0,
-            'message' => trans('BlessingSkin\\OAuth::admin.client-created'),
+            'message' => trans('BlessingSkin\\AuthService::admin.client-created'),
             'data' => $client,
         ]);
     }
@@ -96,7 +97,7 @@ class AdminController extends Controller
 
         return response()->json([
             'code' => 0,
-            'message' => trans('BlessingSkin\\OAuth::admin.client-updated'),
+            'message' => trans('BlessingSkin\\AuthService::admin.client-updated'),
         ]);
     }
 
@@ -113,7 +114,83 @@ class AdminController extends Controller
 
         return response()->json([
             'code' => 0,
-            'message' => trans('BlessingSkin\\OAuth::admin.client-deleted'),
+            'message' => trans('BlessingSkin\\AuthService::admin.client-deleted'),
         ]);
+    }
+
+    /**
+     * 生成新的 JWT 密钥对
+     *
+     * @param \BlessingSkin\AuthService\JwtService $jwtService
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function generateNewKey(\BlessingSkin\AuthService\JwtService $jwtService)
+    {
+        try {
+            // 生成新的密钥对
+            $jwtService->generateNewKeyPair();
+
+            return response()->json([
+                'code' => 0,
+                'message' => trans('BlessingSkin\\AuthService::config.key-generated'),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'code' => 1,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * 清理过期和已撤销的令牌
+     *
+     * @param \BlessingSkin\AuthService\TokenCleanupService $cleanupService
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function cleanupTokens(\BlessingSkin\AuthService\TokenCleanupService $cleanupService)
+    {
+        try {
+            $stats = $cleanupService->cleanupAll();
+
+            return response()->json([
+                'code' => 0,
+                'message' => trans('BlessingSkin\\AuthService::config.tokens-cleaned', ['count' => $stats['total']]),
+                'data' => $stats,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'code' => 1,
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    /**
+     * 生成SAML证书
+     *
+     * @param \BlessingSkin\AuthService\SamlService $samlService
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function generateSamlCertificate(\BlessingSkin\AuthService\SamlService $samlService)
+    {
+        try {
+            // 生成自签名证书
+            $cert = $samlService->generateSelfSignedCertificate();
+
+            // 存储到选项中
+            option(['oauth_saml_x509cert' => $cert['certificate']]);
+            option(['oauth_saml_private_key' => $cert['privateKey']]);
+
+            return response()->json([
+                'code' => 0,
+                'message' => trans('BlessingSkin\\AuthService::config.saml-cert-generated'),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'code' => 1,
+                'message' => $e->getMessage(),
+            ]);
+        }
     }
 }

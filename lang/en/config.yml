@@ -1,9 +1,78 @@
 title: OAuth Service Configuration
-token-lifetime: Access Token Lifetime
-token-lifetime-hint: The lifetime of access tokens in minutes
-refresh-token-lifetime: Refresh Token Lifetime
-refresh-token-lifetime-hint: The lifetime of refresh tokens in days
+
+# URL Information
+url:
+  oauth-label: 'OAuth Service API URL:'
+  oidc-label: 'OpenID Connect Configuration URL:'
+  saml-label: 'SAML Metadata URL:'
+  notice: Please ensure the above URLs are accessible and use the correct addresses when configuring clients.
+
+# Basic Configuration
+basic:
+  title: Basic Configuration
+  token-lifetime: Access Token Lifetime
+  token-lifetime-hint: The lifetime of access tokens in minutes
+  refresh-token-lifetime: Refresh Token Lifetime
+  refresh-token-lifetime-hint: The lifetime of refresh tokens in days
+
+# OIDC Configuration
+oidc:
+  title: OpenID Connect Configuration
+  id-token-lifetime: ID Token Lifetime
+  id-token-lifetime-hint: The lifetime of ID tokens in minutes
+  issuer: Issuer URL
+  issuer-hint: OpenID Connect issuer identifier, typically your site URL
+
+# JWT Configuration
+jwt:
+  title: JWT Key Management
+  generate-new-key: Generate New JWT Key
+  generate-new-key-hint: Generate a new RSA key pair for signing JWT tokens
+  cleanup-tokens: Clean Up Expired and Revoked Tokens
+  cleanup-tokens-hint: Delete all expired and revoked token records to free up database space
+  cleanup-details: Cleanup Details
+  tokens-cleaned: Cleaned up {count} token records
+
+# Common
 minutes: minutes
 days: days
 invalid-token-lifetime: Access token lifetime must be a number greater than 0
 invalid-refresh-token-lifetime: Refresh token lifetime must be a number greater than 0
+invalid-id-token-lifetime: ID token lifetime must be a number greater than 0
+key-generated: New JWT key pair has been generated
+
+# SAML Configuration
+saml:
+  title: SAML Settings
+  enabled: Enable SAML
+  enabled-hint: Enable SAML Single Sign-On functionality
+  entity-id: Service Provider Entity ID
+  entity-id-hint: Entity ID of the Service Provider (SP), typically the metadata URL
+  idp-entity-id: Identity Provider Entity ID
+  idp-entity-id-hint: Entity ID of the Identity Provider (IdP)
+  idp-sso-url: Identity Provider SSO URL
+  idp-sso-url-hint: Single Sign-On service URL of the Identity Provider (IdP)
+  idp-slo-url: Identity Provider SLO URL
+  idp-slo-url-hint: Single Logout service URL of the Identity Provider (IdP)
+  idp-x509cert: Identity Provider X.509 Certificate
+  idp-x509cert-hint: X.509 certificate of the Identity Provider (IdP) for validating SAML responses
+  nameid-format: NameID Format
+  nameid-format-hint: Format of the SAML NameID
+  attr-email: Email Attribute Name
+  attr-email-hint: Name of the attribute containing user's email in SAML assertion
+  attr-name: Name Attribute Name
+  attr-name-hint: Name of the attribute containing user's name in SAML assertion
+  auto-register: Auto Register Users
+  auto-register-hint: Automatically create user accounts if they don't exist
+
+# SAML Certificate
+saml-cert:
+  title: SAML Certificate
+  x509cert: Service Provider X.509 Certificate
+  x509cert-hint: X.509 certificate of the Service Provider (SP) for signing SAML requests
+  private-key: Service Provider Private Key
+  private-key-hint: Private key of the Service Provider (SP) for signing SAML requests
+  generate: Generate SAML Certificate
+  generate-hint: Generate a new self-signed certificate for SAML
+
+saml-cert-generated: New SAML certificate has been generated

@@ -1,0 +1,15 @@
+{
+    "name": "blessing-skin/auth",
+    "description": "为第三方应用提供 OAuth, OIDC 和 SAML 认证服务",
+    "type": "blessing-skin-plugin",
+    "require": {
+        "firebase/php-jwt": "^6.0",
+        "onelogin/php-saml": "^4.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "BlessingSkin\\AuthService\\": "src/"
+        }
+    }
+}

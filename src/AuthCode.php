@@ -1,6 +1,6 @@
 <?php
 
-namespace BlessingSkin\OAuth;
+namespace BlessingSkin\AuthService;
 
 use App\Models\User;
 use Illuminate\Database\Eloquent\Model;
@@ -40,6 +40,7 @@ class AuthCode extends Model
         'scopes',
         'revoked',
         'expires_at',
+        'nonce',
     ];
 
     /**

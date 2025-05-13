@@ -40,4 +40,37 @@ Route::prefix('oauth')
 
         // 用户信息端点
         Route::get('userinfo', 'OAuthController@getUserInfo');
+
+        // OIDC 配置端点
+        Route::get('.well-known/openid-configuration', 'OidcController@configuration');
+
+        // JWKS 端点
+        Route::get('jwks', 'OidcController@jwks');
+    });
+
+// SAML 路由
+Route::prefix('saml')
+    ->middleware(['web'])
+    ->group(function () {
+        // SAML 元数据端点
+        Route::get('metadata', 'SamlController@metadata');
+
+        // SAML 登录端点
+        Route::get('login', 'SamlController@login');
+
+        // SAML 断言消费服务（ACS）端点
+        Route::post('acs', 'SamlController@acs');
+
+        // SAML 单点登出（SLO）端点
+        Route::get('slo', 'SamlController@slo');
+        Route::post('slo', 'SamlController@slo');
+    });
+
+// 管理员 API 路由
+Route::prefix('api/admin/oauth')
+    ->middleware(['web', 'auth', 'role:admin'])
+    ->group(function () {
+        Route::post('keys', 'AdminController@generateNewKey');
+        Route::post('cleanup', 'AdminController@cleanupTokens');
+        Route::post('saml-certificate', 'AdminController@generateSamlCertificate');
     });

@@ -1,0 +1,16 @@
+# SAML Error Messages
+metadata-error: Error generating SAML metadata
+login-error: Error initiating SAML authentication request
+acs-error: Error processing SAML response
+slo-error: Error processing SAML logout request
+auth-failed: SAML authentication failed
+user-not-found: User not found and auto-registration is disabled
+client-not-found: Client not found
+logout-success: You have been successfully logged out
+
+# SAML Log Messages
+metadata-generation-failed: SAML metadata generation failed
+login-request-failed: SAML authentication request failed
+response-processing-error: SAML response processing error
+slo-processing-error: SAML SLO processing error
+acs-processing-error: SAML ACS processing error

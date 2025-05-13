@@ -4,6 +4,7 @@ client-requesting: The application "{client}" is requesting access to your accou
 permissions-title: "This application will be able to:"
 permission-profile: Access your basic profile information
 permission-email: Access your email address
+permission-openid: Verify your identity using OpenID Connect
 deny: Deny
 approve: Authorize
 access-denied: User denied the authorization request
@@ -15,3 +16,9 @@ invalid-refresh-token: Invalid refresh token
 missing-token: Missing access token
 invalid-token: Invalid access token
 user-not-found: User not found
+invalid-nonce: Invalid nonce parameter
+missing-nonce: Missing nonce parameter
+invalid-scope: Invalid scope
+missing-scope: Missing scope parameter
+invalid-response-type: Invalid response type
+invalid-id-token: Invalid ID token

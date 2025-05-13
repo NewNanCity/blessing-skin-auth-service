@@ -1,11 +1,11 @@
 {
-  "name": "blessing-skin-oauth",
-  "title": "OAuth 服务",
+  "name": "blessing-skin-auth-service",
+  "title": "认证服务",
   "version": "0.1.0",
-  "description": "为第三方应用提供 OAuth 认证服务",
+  "description": "为第三方应用提供 OAuth, OIDC 和 SAML 认证服务",
   "author": "Ke Wang",
   "url": "",
-  "namespace": "BlessingSkin\\OAuth",
+  "namespace": "BlessingSkin\\AuthService",
   "require": {
     "blessing-skin-server": "^6"
   },

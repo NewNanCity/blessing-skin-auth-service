@@ -1,0 +1,16 @@
+# SAML 错误信息
+metadata-error: 生成SAML元数据时出错
+login-error: 发起SAML认证请求时出错
+acs-error: 处理SAML响应时出错
+slo-error: 处理SAML登出请求时出错
+auth-failed: SAML认证失败
+user-not-found: 未找到用户，且自动注册功能已禁用
+client-not-found: 客户端不存在
+logout-success: 您已成功登出
+
+# SAML 日志信息
+metadata-generation-failed: SAML元数据生成失败
+login-request-failed: SAML认证请求失败
+response-processing-error: SAML响应处理错误
+slo-processing-error: SAML SLO处理错误
+acs-processing-error: SAML ACS处理错误

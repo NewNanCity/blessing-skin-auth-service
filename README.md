@@ -1,10 +1,13 @@
-# BlessingSkin OAuth 服务
+# BlessingSkin Auth 服务
 
-这个插件为 BlessingSkin 添加了 OAuth 2.0 服务提供者功能，允许第三方应用通过 OAuth 协议获取用户授权并访问用户信息。
+这个插件为 BlessingSkin 添加了 OAuth 2.0、OpenID Connect (OIDC) 和 SAML 2.0 服务提供者功能，允许第三方应用通过 OAuth 协议获取用户授权并访问用户信息，通过 OIDC 协议验证用户身份，或通过 SAML 协议实现单点登录。
 
 ## 功能特点
 
 - 支持 OAuth 2.0 授权码授权流程
+- 支持 OpenID Connect (OIDC) 标准
+- 支持 SAML 2.0 单点登录
+- 使用 JWT (JSON Web Token) 作为访问令牌和 ID 令牌
 - 提供用户信息 API 端点
 - 支持刷新令牌
 - 管理员可以创建和管理 OAuth 应用
@@ -43,11 +46,20 @@
 2. 提供应用名称、重定向 URI 和应用描述
 3. 获取客户端 ID 和客户端密钥
 
-#### OAuth 端点
+#### OAuth/OIDC 端点
 
 - 授权端点：`/oauth/authorize`
 - 令牌端点：`/oauth/token`
 - 用户信息端点：`/oauth/userinfo`
+- OIDC 配置端点：`/.well-known/openid-configuration`
+- JWKS 端点：`/oauth/jwks`
+
+#### SAML 端点
+
+- SAML 元数据端点：`/saml/metadata`
+- SAML 登录端点：`/saml/login`
+- SAML 断言消费服务（ACS）端点：`/saml/acs`
+- SAML 单点登出（SLO）端点：`/saml/slo`
 
 #### 授权流程
 
