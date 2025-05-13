@@ -26,12 +26,19 @@ oidc:
 # JWT配置
 jwt:
   title: JWT 密钥管理
+  public-key: 公钥
+  public-key-hint: JWT 令牌验证用的公钥，请勿随意修改
+  private-key: 私钥
+  private-key-hint: JWT 令牌签名用的私钥，请妥善保管，不要泄露
   generate-new-key: 生成新的 JWT 密钥
   generate-new-key-hint: 生成新的 RSA 密钥对用于签名 JWT 令牌
   cleanup-tokens: 清理过期和已撤销的令牌
   cleanup-tokens-hint: 删除所有过期和已撤销的令牌记录，释放数据库空间
   cleanup-details: 清理详情
   tokens-cleaned: 已清理 {count} 条令牌记录
+  key-updated: JWT 密钥已更新
+  key-invalid: 无效的密钥格式，请检查后重试
+  key-not-match: 公钥和私钥不匹配，请检查后重试
 
 # 通用
 minutes: 分钟

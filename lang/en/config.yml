@@ -26,12 +26,19 @@ oidc:
 # JWT Configuration
 jwt:
   title: JWT Key Management
+  public-key: Public Key
+  public-key-hint: Public key used for JWT token verification, do not modify randomly
+  private-key: Private Key
+  private-key-hint: Private key used for JWT token signing, keep it secure and do not expose it
   generate-new-key: Generate New JWT Key
   generate-new-key-hint: Generate a new RSA key pair for signing JWT tokens
   cleanup-tokens: Clean Up Expired and Revoked Tokens
   cleanup-tokens-hint: Delete all expired and revoked token records to free up database space
   cleanup-details: Cleanup Details
   tokens-cleaned: Cleaned up {count} token records
+  key-updated: JWT key pair has been updated
+  key-invalid: Invalid key format, please check and try again
+  key-not-match: Public and private keys do not match, please check and try again
 
 # Common
 minutes: minutes

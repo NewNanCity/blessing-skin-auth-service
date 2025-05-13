@@ -37,18 +37,85 @@ class Configuration
 
         // JWT密钥管理表单
         $jwtForm = Option::form('jwt', trans('BlessingSkin\\AuthService::config.jwt.title'), function (OptionForm $form) {
+            // 显示和编辑公钥
+            $form->textarea('oauth_jwt_public_key', trans('BlessingSkin\\AuthService::config.jwt.public-key'))
+                ->hint(trans('BlessingSkin\\AuthService::config.jwt.public-key-hint'))
+                ->rows(8)
+                ->format(function ($value) {
+                    // 验证公钥格式
+                    $pubRes = @openssl_pkey_get_public($value);
+                    if ($pubRes === false) {
+                        return option('oauth_jwt_public_key'); // 如果格式无效，返回原值
+                    }
+                    return $value;
+                });
+
+            // 显示和编辑私钥
+            $form->textarea('oauth_jwt_private_key', trans('BlessingSkin\\AuthService::config.jwt.private-key'))
+                ->hint(trans('BlessingSkin\\AuthService::config.jwt.private-key-hint'))
+                ->rows(8)
+                ->format(function ($value) {
+                    // 验证私钥格式
+                    $privRes = @openssl_pkey_get_private($value);
+                    if ($privRes === false) {
+                        return option('oauth_jwt_private_key'); // 如果格式无效，返回原值
+                    }
+
+                    // 验证公钥和私钥是否匹配
+                    $publicKey = request('oauth_jwt_public_key');
+                    $pubRes = @openssl_pkey_get_public($publicKey);
+
+                    if ($pubRes !== false && $privRes !== false) {
+                        $pubDetails = openssl_pkey_get_details($pubRes);
+                        $privDetails = openssl_pkey_get_details($privRes);
+
+                        if ($pubDetails['key'] !== $privDetails['key']) {
+                            return option('oauth_jwt_private_key'); // 如果不匹配，返回原值
+                        }
+                    }
+
+                    // 生成新的kid
+                    option(['oauth_jwt_kid' => (string)time()]);
+
+                    return $value;
+                });
+
+            // 生成新密钥按钮
             $form->addButton([
                 'style' => 'primary',
                 'text' => trans('BlessingSkin\\AuthService::config.jwt.generate-new-key'),
                 'name' => 'btn-generate-key'
             ])->hint(trans('BlessingSkin\\AuthService::config.jwt.generate-new-key-hint'));
 
+            // 清理令牌按钮
             $form->addButton([
                 'style' => 'warning',
                 'text' => trans('BlessingSkin\\AuthService::config.jwt.cleanup-tokens'),
                 'name' => 'btn-cleanup-tokens'
             ])->hint(trans('BlessingSkin\\AuthService::config.jwt.cleanup-tokens-hint'));
         })->handle();
+
+        // 添加验证消息
+        if (request()->isMethod('post') && request()->has('oauth_jwt_public_key')) {
+            $publicKey = request('oauth_jwt_public_key');
+            $privateKey = request('oauth_jwt_private_key');
+
+            $pubRes = @openssl_pkey_get_public($publicKey);
+            $privRes = @openssl_pkey_get_private($privateKey);
+
+            if ($pubRes === false || $privRes === false) {
+                $jwtForm->addMessage(trans('BlessingSkin\\AuthService::config.jwt.key-invalid'), 'danger');
+            } else {
+                $pubDetails = openssl_pkey_get_details($pubRes);
+                $privDetails = openssl_pkey_get_details($privRes);
+
+                if ($pubDetails['key'] !== $privDetails['key']) {
+                    $jwtForm->addMessage(trans('BlessingSkin\\AuthService::config.jwt.key-not-match'), 'danger');
+                } else {
+                    $jwtForm->addMessage(trans('BlessingSkin\\AuthService::config.jwt.key-updated'), 'success');
+                }
+            }
+        }
 
         // SAML配置表单
         $samlForm = Option::form('saml', trans('BlessingSkin\\AuthService::config.saml.title'), function (OptionForm $form) {
