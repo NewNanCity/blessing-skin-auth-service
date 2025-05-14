@@ -5,6 +5,7 @@ namespace BlessingSkin\AuthService;
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Str;
 use Carbon\Carbon;
 
 /**
@@ -200,6 +201,40 @@ class JwtService
         if (isset($userData['nickname'])) {
             $payload['name'] = $userData['nickname'];
         }
+
+        $jwt = JWT::encode($payload, $keyPair['private_key'], 'RS256', $keyPair['kid']);
+
+        return $jwt;
+    }
+
+    /**
+     * 生成客户端凭证令牌
+     *
+     * @param int $clientId 客户端ID
+     * @param string $scopes 作用域
+     * @return string 生成的JWT令牌
+     */
+    public function generateClientCredentialsToken($clientId, $scopes)
+    {
+        $keyPair = $this->getActiveKeyPair();
+
+        if (!$keyPair) {
+            throw new \Exception('没有可用的JWT密钥对');
+        }
+
+        $now = Carbon::now()->timestamp;
+        $expiresAt = Carbon::now()->addMinutes(option('oauth_token_lifetime', 60))->timestamp;
+
+        $payload = [
+            'iss' => option('oauth_issuer', url('/')),  // 颁发者
+            'sub' => 'client_' . $clientId,             // 主题（客户端ID）
+            'aud' => (string)$clientId,                 // 受众（客户端ID）
+            'iat' => $now,                              // 颁发时间
+            'exp' => $expiresAt,                        // 过期时间
+            'jti' => Str::random(40),                   // JWT ID
+            'scope' => $scopes,                         // 作用域
+            'token_type' => 'access_token'              // 令牌类型
+        ];
 
         $jwt = JWT::encode($payload, $keyPair['private_key'], 'RS256', $keyPair['kid']);
 

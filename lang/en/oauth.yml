@@ -22,3 +22,6 @@ invalid-scope: Invalid scope
 missing-scope: Missing scope parameter
 invalid-response-type: Invalid response type
 invalid-id-token: Invalid ID token
+unsupported-grant-type: Unsupported grant type
+invalid-credentials: Invalid user credentials
+csrf-token-mismatch: CSRF token mismatch

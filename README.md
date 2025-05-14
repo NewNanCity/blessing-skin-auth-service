@@ -4,12 +4,16 @@
 
 ## 功能特点
 
-- 支持 OAuth 2.0 授权码授权流程
+- 支持 OAuth 2.0 的所有授权模式：
+  - 授权码模式（Authorization Code Grant）
+  - 隐式授权模式（Implicit Grant）
+  - 客户端凭证模式（Client Credentials Grant）
+  - 资源所有者密码凭证模式（Resource Owner Password Credentials Grant）
+  - 刷新令牌模式（Refresh Token Grant）
 - 支持 OpenID Connect (OIDC) 标准
 - 支持 SAML 2.0 单点登录
 - 使用 JWT (JSON Web Token) 作为访问令牌和 ID 令牌
 - 提供用户信息 API 端点
-- 支持刷新令牌
 - 管理员可以创建和管理 OAuth 应用
 - 用户可以查看和管理自己授权过的应用
 
@@ -63,9 +67,11 @@
 
 #### 授权流程
 
+##### 授权码模式（Authorization Code Grant）
+
 1. 引导用户访问授权页面：
 ```
-https://你的皮肤站地址/oauth/authorize?client_id=CLIENT_ID&redirect_uri=REDIRECT_URI&response_type=code&state=STATE
+https://你的皮肤站地址/oauth/authorize?client_id=CLIENT_ID&redirect_uri=REDIRECT_URI&response_type=code&state=STATE&scope=profile
 ```
 
 2. 用户授权后，服务器会重定向到您的 `redirect_uri`，并附带授权码：
@@ -82,20 +88,54 @@ Content-Type: application/x-www-form-urlencoded
 grant_type=authorization_code&client_id=CLIENT_ID&client_secret=CLIENT_SECRET&code=AUTHORIZATION_CODE&redirect_uri=REDIRECT_URI
 ```
 
-4. 使用访问令牌获取用户信息：
-```http
-GET /oauth/userinfo HTTP/1.1
-Host: 你的皮肤站地址
-Authorization: Bearer ACCESS_TOKEN
+##### 隐式授权模式（Implicit Grant）
+
+1. 引导用户访问授权页面，使用 `response_type=token`：
+```
+https://你的皮肤站地址/oauth/authorize?client_id=CLIENT_ID&redirect_uri=REDIRECT_URI&response_type=token&state=STATE&scope=profile
 ```
 
-5. 刷新访问令牌（当访问令牌过期时）：
+2. 用户授权后，服务器会重定向到您的 `redirect_uri`，并在URL片段中附带访问令牌：
+```
+https://你的应用地址/callback#access_token=ACCESS_TOKEN&token_type=Bearer&expires_in=3600&state=STATE
+```
+
+##### 客户端凭证模式（Client Credentials Grant）
+
+```http
+POST /oauth/token HTTP/1.1
+Host: 你的皮肤站地址
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=client_credentials&client_id=CLIENT_ID&client_secret=CLIENT_SECRET&scope=profile
+```
+
+##### 资源所有者密码凭证模式（Resource Owner Password Credentials Grant）
+
+```http
+POST /oauth/token HTTP/1.1
+Host: 你的皮肤站地址
+Content-Type: application/x-www-form-urlencoded
+
+grant_type=password&client_id=CLIENT_ID&client_secret=CLIENT_SECRET&username=USER_EMAIL&password=USER_PASSWORD&scope=profile
+```
+
+##### 刷新令牌模式（Refresh Token Grant）
+
 ```http
 POST /oauth/token HTTP/1.1
 Host: 你的皮肤站地址
 Content-Type: application/x-www-form-urlencoded
 
 grant_type=refresh_token&client_id=CLIENT_ID&client_secret=CLIENT_SECRET&refresh_token=REFRESH_TOKEN
+```
+
+##### 使用访问令牌获取用户信息
+
+```http
+GET /oauth/userinfo HTTP/1.1
+Host: 你的皮肤站地址
+Authorization: Bearer ACCESS_TOKEN
 ```
 
 #### 用户信息响应

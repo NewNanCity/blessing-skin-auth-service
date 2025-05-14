@@ -22,3 +22,6 @@ invalid-scope: 无效的作用域
 missing-scope: 缺少作用域参数
 invalid-response-type: 无效的响应类型
 invalid-id-token: 无效的 ID 令牌
+unsupported-grant-type: 不支持的授权类型
+invalid-credentials: 无效的用户凭据
+csrf-token-mismatch: CSRF 令牌不匹配

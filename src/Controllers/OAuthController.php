@@ -52,6 +52,10 @@ class OAuthController extends Controller
     {
         $this->jwtService = $jwtService;
         $this->oidcService = $oidcService;
+
+        // 添加CSRF保护，但排除令牌端点和用户信息端点
+        $this->middleware('web');
+        $this->middleware('csrf')->except(['issueToken', 'getUserInfo']);
     }
     /**
      * 显示授权页面
@@ -64,7 +68,7 @@ class OAuthController extends Controller
         $validator = Validator::make($request->all(), [
             'client_id' => 'required|string',
             'redirect_uri' => 'required|string|url',
-            'response_type' => 'required|string|in:code',
+            'response_type' => 'required|string|in:code,token',
             'scope' => 'nullable|string',
             'state' => 'nullable|string',
             'nonce' => 'nullable|string',
@@ -112,7 +116,7 @@ class OAuthController extends Controller
         $validator = Validator::make($request->all(), [
             'client_id' => 'required|string',
             'redirect_uri' => 'required|string|url',
-            'response_type' => 'required|string|in:code',
+            'response_type' => 'required|string|in:code,token',
             'scope' => 'nullable|string',
             'state' => 'nullable|string',
             'nonce' => 'nullable|string',
@@ -162,29 +166,99 @@ class OAuthController extends Controller
         // 获取nonce
         $nonce = $request->input('nonce');
 
-        // 创建授权码
-        $authCode = AuthCode::create([
-            'id' => Str::random(40),
-            'user_id' => Auth::id(),
-            'client_id' => $client->id,
-            'scopes' => $scopesString,
-            'revoked' => false,
-            'expires_at' => Carbon::now()->addMinutes(10),
-            'nonce' => $nonce,
-        ]);
-
         // 创建或更新授权记录
         Authorization::updateOrCreate(
             ['user_id' => Auth::id(), 'client_id' => $client->id],
             ['user_id' => Auth::id(), 'client_id' => $client->id]
         );
 
-        $query = http_build_query([
-            'code' => $authCode->id,
-            'state' => $request->input('state'),
-        ]);
+        // 根据响应类型处理
+        if ($request->input('response_type') === 'code') {
+            // 授权码模式
+            $authCode = AuthCode::create([
+                'id' => Str::random(40),
+                'user_id' => Auth::id(),
+                'client_id' => $client->id,
+                'scopes' => $scopesString,
+                'revoked' => false,
+                'expires_at' => Carbon::now()->addMinutes(10),
+                'nonce' => $nonce,
+            ]);
 
-        return redirect()->to($client->redirect_uri . '?' . $query);
+            $query = http_build_query([
+                'code' => $authCode->id,
+                'state' => $request->input('state'),
+            ]);
+
+            return redirect()->to($client->redirect_uri . '?' . $query);
+        } else {
+            // 隐式授权模式
+            try {
+                // 生成访问令牌
+                $accessToken = $this->jwtService->generateAccessToken(
+                    Auth::id(),
+                    $client->id,
+                    $scopesString
+                );
+            } catch (\Exception $e) {
+                return redirect()->to($client->redirect_uri . '?' . http_build_query([
+                    'error' => 'server_error',
+                    'error_description' => $e->getMessage(),
+                    'state' => $request->input('state'),
+                ]));
+            }
+
+            // 创建访问令牌记录
+            $token = Token::create([
+                'id' => $accessToken,
+                'user_id' => Auth::id(),
+                'client_id' => $client->id,
+                'scopes' => $scopesString,
+                'revoked' => false,
+                'expires_at' => Carbon::now()->addMinutes(option('oauth_token_lifetime', 60)),
+            ]);
+
+            // 准备响应参数
+            $responseParams = [
+                'access_token' => $accessToken,
+                'token_type' => 'Bearer',
+                'expires_in' => Carbon::now()->diffInSeconds($token->expires_at),
+                'scope' => $token->scopes,
+                'state' => $request->input('state'),
+            ];
+
+            // 如果请求包含 openid 作用域，生成 ID 令牌
+            $isOpenId = in_array('openid', $validScopes);
+            if ($isOpenId && $nonce) {
+                // 准备用户数据
+                $user = Auth::user();
+                $userData = [
+                    'email' => $user->email,
+                    'nickname' => $user->nickname,
+                ];
+
+                // 生成 ID 令牌
+                try {
+                    $idToken = $this->jwtService->generateIdToken(
+                        Auth::id(),
+                        $client->id,
+                        $userData,
+                        $nonce
+                    );
+
+                    $responseParams['id_token'] = $idToken;
+                } catch (\Exception $e) {
+                    return redirect()->to($client->redirect_uri . '?' . http_build_query([
+                        'error' => 'server_error',
+                        'error_description' => $e->getMessage(),
+                        'state' => $request->input('state'),
+                    ]));
+                }
+            }
+
+            // 使用URL片段（fragment）而不是查询参数
+            return redirect()->to($client->redirect_uri . '#' . http_build_query($responseParams));
+        }
     }
 
     /**
@@ -196,7 +270,7 @@ class OAuthController extends Controller
     public function issueToken(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'grant_type' => 'required|string|in:authorization_code,refresh_token',
+            'grant_type' => 'required|string|in:authorization_code,refresh_token,client_credentials,password',
             'client_id' => 'required|string',
             'client_secret' => 'required|string',
         ]);
@@ -220,12 +294,21 @@ class OAuthController extends Controller
             ], 401);
         }
 
-        if ($request->input('grant_type') === 'authorization_code') {
-            return $this->handleAuthorizationCode($request, $client);
-        }
-
-        if ($request->input('grant_type') === 'refresh_token') {
-            return $this->handleRefreshToken($request, $client);
+        // 根据授权类型分发到不同的处理方法
+        switch ($request->input('grant_type')) {
+            case 'authorization_code':
+                return $this->handleAuthorizationCode($request, $client);
+            case 'refresh_token':
+                return $this->handleRefreshToken($request, $client);
+            case 'client_credentials':
+                return $this->handleClientCredentials($request, $client);
+            case 'password':
+                return $this->handlePassword($request, $client);
+            default:
+                return response()->json([
+                    'error' => 'unsupported_grant_type',
+                    'error_description' => trans('BlessingSkin\\AuthService::oauth.unsupported-grant-type'),
+                ], 400);
         }
     }
 
@@ -531,6 +614,207 @@ class OAuthController extends Controller
             try {
                 $idToken = $this->jwtService->generateIdToken(
                     $accessToken->user_id,
+                    $client->id,
+                    $userData,
+                    $nonce
+                );
+
+                $response['id_token'] = $idToken;
+            } catch (\Exception $e) {
+                return response()->json([
+                    'error' => 'server_error',
+                    'error_description' => $e->getMessage(),
+                ], 500);
+            }
+        }
+
+        return response()->json($response);
+    }
+
+    /**
+     * 处理客户端凭证授权类型
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \BlessingSkin\AuthService\Client  $client
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function handleClientCredentials(Request $request, Client $client)
+    {
+        $validator = Validator::make($request->all(), [
+            'scope' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => 'invalid_request',
+                'error_description' => $validator->errors()->first(),
+            ], 400);
+        }
+
+        // 验证作用域
+        $scopes = $request->input('scope', '');
+        $validScopes = $this->oidcService->validateScopes($scopes);
+
+        // 客户端凭证模式不应该包含用户相关的作用域
+        $validScopes = array_filter($validScopes, function($scope) {
+            return !in_array($scope, ['openid', 'profile', 'email']);
+        });
+
+        $scopesString = implode(' ', $validScopes);
+
+        // 生成访问令牌
+        try {
+            $accessToken = $this->jwtService->generateClientCredentialsToken(
+                $client->id,
+                $scopesString
+            );
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'server_error',
+                'error_description' => $e->getMessage(),
+            ], 500);
+        }
+
+        // 创建访问令牌记录
+        $token = Token::create([
+            'id' => $accessToken,
+            'user_id' => null, // 客户端凭证模式没有关联用户
+            'client_id' => $client->id,
+            'scopes' => $scopesString,
+            'revoked' => false,
+            'expires_at' => Carbon::now()->addMinutes(option('oauth_token_lifetime', 60)),
+        ]);
+
+        // 准备响应
+        $response = [
+            'access_token' => $accessToken,
+            'token_type' => 'Bearer',
+            'expires_in' => Carbon::now()->diffInSeconds($token->expires_at),
+            'scope' => $token->scopes,
+        ];
+
+        return response()->json($response);
+    }
+
+    /**
+     * 处理密码授权类型
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \BlessingSkin\AuthService\Client  $client
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function handlePassword(Request $request, Client $client)
+    {
+        $validator = Validator::make($request->all(), [
+            'username' => 'required|string',
+            'password' => 'required|string',
+            'scope' => 'nullable|string',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'error' => 'invalid_request',
+                'error_description' => $validator->errors()->first(),
+            ], 400);
+        }
+
+        // 验证用户凭证
+        $credentials = [
+            'email' => $request->input('username'),
+            'password' => $request->input('password'),
+        ];
+
+        if (!Auth::attempt($credentials)) {
+            return response()->json([
+                'error' => 'invalid_grant',
+                'error_description' => trans('BlessingSkin\\AuthService::oauth.invalid-credentials'),
+            ], 400);
+        }
+
+        $user = Auth::user();
+
+        // 验证作用域
+        $scopes = $request->input('scope', '');
+        $validScopes = $this->oidcService->validateScopes($scopes);
+        $scopesString = implode(' ', $validScopes);
+        $isOpenId = in_array('openid', $validScopes);
+
+        // 创建或更新授权记录
+        Authorization::updateOrCreate(
+            ['user_id' => $user->uid, 'client_id' => $client->id],
+            ['user_id' => $user->uid, 'client_id' => $client->id]
+        );
+
+        // 生成访问令牌
+        try {
+            $accessToken = $this->jwtService->generateAccessToken(
+                $user->uid,
+                $client->id,
+                $scopesString
+            );
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'server_error',
+                'error_description' => $e->getMessage(),
+            ], 500);
+        }
+
+        // 创建访问令牌记录
+        $token = Token::create([
+            'id' => $accessToken,
+            'user_id' => $user->uid,
+            'client_id' => $client->id,
+            'scopes' => $scopesString,
+            'revoked' => false,
+            'expires_at' => Carbon::now()->addMinutes(option('oauth_token_lifetime', 60)),
+        ]);
+
+        // 生成JWT刷新令牌
+        try {
+            $refreshTokenJwt = $this->jwtService->generateRefreshToken(
+                $user->uid,
+                $client->id,
+                $token->id
+            );
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => 'server_error',
+                'error_description' => $e->getMessage(),
+            ], 500);
+        }
+
+        // 创建刷新令牌记录
+        $refreshToken = RefreshToken::create([
+            'id' => $refreshTokenJwt,
+            'access_token_id' => $token->id,
+            'revoked' => false,
+            'expires_at' => Carbon::now()->addDays(option('oauth_refresh_token_lifetime', 30)),
+        ]);
+
+        // 准备响应
+        $response = [
+            'access_token' => $accessToken,
+            'token_type' => 'Bearer',
+            'expires_in' => Carbon::now()->diffInSeconds($token->expires_at),
+            'refresh_token' => $refreshTokenJwt,
+            'scope' => $token->scopes,
+        ];
+
+        // 如果请求包含 openid 作用域，生成 ID 令牌
+        if ($isOpenId) {
+            // 生成随机nonce
+            $nonce = $this->oidcService->generateNonce();
+
+            // 准备用户数据
+            $userData = [
+                'email' => $user->email,
+                'nickname' => $user->nickname,
+            ];
+
+            // 生成 ID 令牌
+            try {
+                $idToken = $this->jwtService->generateIdToken(
+                    $user->uid,
                     $client->id,
                     $userData,
                     $nonce
