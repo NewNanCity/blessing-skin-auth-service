@@ -41,12 +41,13 @@ Route::prefix('oauth')
         // 用户信息端点
         Route::get('userinfo', 'OAuthController@getUserInfo');
 
-        // OIDC 配置端点
-        Route::get('.well-known/openid-configuration', 'OidcController@configuration');
-
         // JWKS 端点
         Route::get('jwks', 'OidcController@jwks');
     });
+
+// OIDC 配置端点 (不应有 oauth 前缀)
+Route::middleware(['web'])
+    ->get('.well-known/openid-configuration', 'OidcController@configuration');
 
 // SAML 路由
 Route::prefix('saml')

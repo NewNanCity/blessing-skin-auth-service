@@ -23,7 +23,7 @@
         </div>
         <div class="card-body">
           <p>{{ trans('BlessingSkin\\AuthService::config.url.oauth-label') }}<code>{{ url('oauth') }}</code></p>
-          <p>{{ trans('BlessingSkin\\AuthService::config.url.oidc-label') }}<code>{{ url('oauth/.well-known/openid-configuration') }}</code></p>
+          <p>{{ trans('BlessingSkin\\AuthService::config.url.oidc-label') }}<code>{{ url('.well-known/openid-configuration') }}</code></p>
           <p>{{ trans('BlessingSkin\\AuthService::config.url.saml-label') }}<code>{{ url('saml/metadata') }}</code></p>
           <p>{{ trans('BlessingSkin\\AuthService::config.url.notice') }}</p>
         </div>

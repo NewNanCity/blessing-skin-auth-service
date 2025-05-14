@@ -193,14 +193,8 @@ class JwtService
             'nonce' => $nonce,                          // 随机数
         ];
 
-        // 添加用户信息
-        if (isset($userData['email'])) {
-            $payload['email'] = $userData['email'];
-        }
-
-        if (isset($userData['nickname'])) {
-            $payload['name'] = $userData['nickname'];
-        }
+        // 不在JWT中存储用户详细信息，只保留用户ID
+        // 用户详细信息将通过userinfo端点获取
 
         $jwt = JWT::encode($payload, $keyPair['private_key'], 'RS256', $keyPair['kid']);
 

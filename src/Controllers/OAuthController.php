@@ -2,6 +2,8 @@
 
 namespace BlessingSkin\AuthService\Controllers;
 
+use App\Models\Player;
+use App\Models\Texture;
 use App\Models\User;
 use BlessingSkin\AuthService\AuthCode;
 use BlessingSkin\AuthService\Authorization;
@@ -13,6 +15,8 @@ use BlessingSkin\AuthService\Token;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 
@@ -230,12 +234,9 @@ class OAuthController extends Controller
             // 如果请求包含 openid 作用域，生成 ID 令牌
             $isOpenId = in_array('openid', $validScopes);
             if ($isOpenId && $nonce) {
-                // 准备用户数据
+                // 准备用户数据 - 只存储必要信息，其他信息通过userinfo端点获取
                 $user = Auth::user();
-                $userData = [
-                    'email' => $user->email,
-                    'nickname' => $user->nickname,
-                ];
+                $userData = [];
 
                 // 生成 ID 令牌
                 try {
@@ -434,11 +435,8 @@ class OAuthController extends Controller
                 ], 400);
             }
 
-            // 准备用户数据
-            $userData = [
-                'email' => $user->email,
-                'nickname' => $user->nickname,
-            ];
+            // 准备用户数据 - 只存储必要信息，其他信息通过userinfo端点获取
+            $userData = [];
 
             // 生成 ID 令牌
             try {
@@ -604,11 +602,8 @@ class OAuthController extends Controller
 
             $nonce = $authCode ? $authCode->nonce : $this->oidcService->generateNonce();
 
-            // 准备用户数据
-            $userData = [
-                'email' => $user->email,
-                'nickname' => $user->nickname,
-            ];
+            // 准备用户数据 - 只存储必要信息，其他信息通过userinfo端点获取
+            $userData = [];
 
             // 生成 ID 令牌
             try {
@@ -805,11 +800,8 @@ class OAuthController extends Controller
             // 生成随机nonce
             $nonce = $this->oidcService->generateNonce();
 
-            // 准备用户数据
-            $userData = [
-                'email' => $user->email,
-                'nickname' => $user->nickname,
-            ];
+            // 准备用户数据 - 只存储必要信息，其他信息通过userinfo端点获取
+            $userData = [];
 
             // 生成 ID 令牌
             try {
@@ -899,10 +891,133 @@ class OAuthController extends Controller
 
         // 根据作用域添加信息
         if ($hasProfile) {
-            $response['name'] = $user->nickname;
+            // 将nickname重命名为display_name，保持一致性
+            $response['display_name'] = $user->nickname;
             $response['preferred_username'] = $user->nickname;
-            $response['picture'] = $user->avatar;
+
+            // 添加用户语言设置
+            $response['locale'] = $user->locale;
+
+            // 获取用户头像URL
+            if ($user->avatar) {
+                $texture = Texture::find($user->avatar);
+                if ($texture) {
+                    try {
+                        // 根据测试脚本中的方式生成头像URL
+                        $avatarUrl = route('avatar.texture', [
+                            'tid' => $user->avatar,
+                            'size' => 36,
+                            'png' => true
+                        ]);
+                        $response['picture'] = $avatarUrl;
+                        $response['avatar_url'] = $avatarUrl;
+                    } catch (\Exception $e) {
+                        // 如果出错，使用用户头像URL
+                        $avatarUrl = route('avatar.user', [
+                            'uid' => $user->uid,
+                            'size' => 36,
+                            'png' => true
+                        ]);
+                        $response['picture'] = $avatarUrl;
+                        $response['avatar_url'] = $avatarUrl;
+                    }
+                } else {
+                    // 如果材质不存在，使用用户头像URL
+                    $avatarUrl = route('avatar.user', [
+                        'uid' => $user->uid,
+                        'size' => 36,
+                        'png' => true
+                    ]);
+                    $response['picture'] = $avatarUrl;
+                    $response['avatar_url'] = $avatarUrl;
+                }
+            } else {
+                // 如果用户没有设置头像，使用默认头像
+                $avatarUrl = route('avatar.user', [
+                    'uid' => $user->uid,
+                    'size' => 36,
+                    'png' => true
+                ]);
+                $response['picture'] = $avatarUrl;
+                $response['avatar_url'] = $avatarUrl;
+            }
+
             $response['updated_at'] = $user->updated_at->getTimestamp();
+
+            // 获取用户所有角色信息
+            $players = $user->players;
+            if ($players && !$players->isEmpty()) {
+                $playersData = [];
+
+                foreach ($players as $player) {
+                    $playerData = [
+                        'uid' => (string)$player->pid,
+                        'name' => $player->name,
+                    ];
+
+                    // 获取玩家UUID
+                    if (Schema::hasTable('uuid')) {
+                        $uuid = DB::table('uuid')->where('name', $player->name)->value('uuid');
+                        if ($uuid) {
+                            $playerData['uuid'] = $uuid;
+                        }
+                    }
+
+                    // 获取皮肤URL
+                    if ($player->tid_skin) {
+                        $skinTexture = Texture::find($player->tid_skin);
+                        if ($skinTexture) {
+                            try {
+                                // 使用预览URL作为皮肤URL
+                                $playerData['skin_url'] = route('preview.texture', [
+                                    'texture' => $skinTexture,
+                                    'png' => true
+                                ]);
+                            } catch (\Exception $e) {
+                                // 如果预览生成失败，尝试使用原始材质URL
+                                try {
+                                    $playerData['skin_url'] = url("/textures/{$skinTexture->hash}");
+                                } catch (\Exception $e2) {
+                                    // 如果预览和原始材质URL都失败，返回空串
+                                    $playerData['skin_url'] = '';
+                                }
+                            }
+                        } else {
+                            // 材质不存在，返回空串
+                            $playerData['skin_url'] = '';
+                        }
+                    }
+
+                    // 获取披风URL
+                    if ($player->tid_cape) {
+                        $capeTexture = Texture::find($player->tid_cape);
+                        if ($capeTexture) {
+                            try {
+                                // 使用预览URL作为披风URL
+                                $playerData['cape_url'] = route('preview.texture', [
+                                    'texture' => $capeTexture,
+                                    'png' => true
+                                ]);
+                            } catch (\Exception $e) {
+                                // 如果预览生成失败，尝试使用原始材质URL
+                                try {
+                                    $playerData['cape_url'] = url("/textures/{$capeTexture->hash}");
+                                } catch (\Exception $e2) {
+                                    // 如果预览和原始材质URL都失败，返回空串
+                                    $playerData['cape_url'] = '';
+                                }
+                            }
+                        } else {
+                            // 材质不存在，返回空串
+                            $playerData['cape_url'] = '';
+                        }
+                    }
+
+                    $playersData[] = $playerData;
+                }
+
+                $response['players'] = $playersData;
+            }
         }
 
         if ($hasEmail) {

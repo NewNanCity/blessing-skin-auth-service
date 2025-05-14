@@ -140,18 +140,52 @@ Authorization: Bearer ACCESS_TOKEN
 
 #### 用户信息响应
 
+用户信息响应遵循 OpenID Connect 标准，根据请求的作用域返回不同的信息：
+
+- `openid` 作用域：返回用户的基本标识信息
+- `profile` 作用域：返回用户的个人资料信息，包括角色信息
+- `email` 作用域：返回用户的电子邮件信息
+
+基本响应示例：
+
 ```json
 {
-  "id": 123,
+  "sub": "123",
+  "display_ame": "用户昵称",
+  "preferred_username": "用户昵称",
+  "locale": "zh_CN",
+  "picture": "https://example.com/avatar/texture/123?size=36&png",
+  "avatar_url": "https://example.com/avatar/texture/123?size=36&png",
+  "updated_at": 1609459200,
   "email": "user@example.com",
-  "nickname": "用户昵称",
-  "score": 100,
-  "avatar": "avatar_url",
-  "permission": 1,
-  "verified": true,
-  "register_at": "2023-01-01T00:00:00+00:00"
+  "email_verified": true,
+  "players": [
+    {
+      "uid": "456",
+      "name": "玩家名称",
+      "uuid": "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx",
+      "skin_url": "https://example.com/preview/texture/789?png",
+      "cape_url": "https://example.com/preview/texture/101?png"
+    }
+  ]
 }
 ```
+
+说明：
+- `sub`：用户ID，字符串类型
+- `display_ame`：用户昵称
+- `preferred_username`：首选用户名
+- `locale`：用户语言设置
+- `picture`/`avatar_url`：用户头像URL
+- `updated_at`：用户信息更新时间戳
+- `email`：用户电子邮件地址（需要email作用域）
+- `email_verified`：电子邮件是否已验证（需要email作用域）
+- `players`：用户的角色列表（需要profile作用域）
+  - `uid`：角色ID
+  - `name`：角色名称
+  - `uuid`：角色的Minecraft UUID（如果存在）
+  - `skin_url`：角色皮肤URL
+  - `cape_url`：角色披风URL（如果有）
 
 ## 配置选项
 
