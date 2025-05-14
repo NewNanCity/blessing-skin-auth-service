@@ -57,9 +57,8 @@ class OAuthController extends Controller
         $this->jwtService = $jwtService;
         $this->oidcService = $oidcService;
 
-        // 添加CSRF保护，但排除令牌端点和用户信息端点
+        // 添加CSRF保护，但排除令牌端点、用户信息端点和测试端点
         $this->middleware('web');
-        $this->middleware('csrf')->except(['issueToken', 'getUserInfo']);
     }
     /**
      * 显示授权页面
@@ -226,7 +225,7 @@ class OAuthController extends Controller
             $responseParams = [
                 'access_token' => $accessToken,
                 'token_type' => 'Bearer',
-                'expires_in' => Carbon::now()->diffInSeconds($token->expires_at),
+                'expires_in' => $token->expires_at ? Carbon::now()->diffInSeconds($token->expires_at) : option('oauth_token_lifetime', 60) * 60,
                 'scope' => $token->scopes,
                 'state' => $request->input('state'),
             ];
@@ -420,7 +419,7 @@ class OAuthController extends Controller
         $response = [
             'access_token' => $accessToken,
             'token_type' => 'Bearer',
-            'expires_in' => Carbon::now()->diffInSeconds($token->expires_at),
+            'expires_in' => $token->expires_at ? Carbon::now()->diffInSeconds($token->expires_at) : option('oauth_token_lifetime', 60) * 60,
             'refresh_token' => $refreshTokenJwt,
             'scope' => $token->scopes,
         ];
@@ -512,6 +511,14 @@ class OAuthController extends Controller
             ], 400);
         }
 
+        // 确保访问令牌的过期时间存在
+        if (!$accessToken->expires_at) {
+            return response()->json([
+                'error' => 'server_error',
+                'error_description' => '访问令牌缺少过期时间',
+            ], 500);
+        }
+
         // 检查令牌是否属于当前客户端
         if ($payload->aud !== (string)$client->id) {
             return response()->json([
@@ -587,7 +594,7 @@ class OAuthController extends Controller
         $response = [
             'access_token' => $newAccessToken,
             'token_type' => 'Bearer',
-            'expires_in' => Carbon::now()->diffInSeconds($token->expires_at),
+            'expires_in' => $token->expires_at ? Carbon::now()->diffInSeconds($token->expires_at) : option('oauth_token_lifetime', 60) * 60,
             'refresh_token' => $newRefreshTokenJwt,
             'scope' => $token->scopes,
         ];
@@ -684,7 +691,7 @@ class OAuthController extends Controller
         $response = [
             'access_token' => $accessToken,
             'token_type' => 'Bearer',
-            'expires_in' => Carbon::now()->diffInSeconds($token->expires_at),
+            'expires_in' => $token->expires_at ? Carbon::now()->diffInSeconds($token->expires_at) : option('oauth_token_lifetime', 60) * 60,
             'scope' => $token->scopes,
         ];
 
@@ -790,7 +797,7 @@ class OAuthController extends Controller
         $response = [
             'access_token' => $accessToken,
             'token_type' => 'Bearer',
-            'expires_in' => Carbon::now()->diffInSeconds($token->expires_at),
+            'expires_in' => $token->expires_at ? Carbon::now()->diffInSeconds($token->expires_at) : option('oauth_token_lifetime', 60) * 60,
             'refresh_token' => $refreshTokenJwt,
             'scope' => $token->scopes,
         ];
@@ -942,7 +949,7 @@ class OAuthController extends Controller
                 $response['avatar_url'] = $avatarUrl;
             }
 
-            $response['updated_at'] = $user->updated_at->getTimestamp();
+            $response['updated_at'] = $user->updated_at ? $user->updated_at->getTimestamp() : time();
 
             // 获取用户所有角色信息
             $players = $user->players;
@@ -959,7 +966,13 @@ class OAuthController extends Controller
                     if (Schema::hasTable('uuid')) {
                         $uuid = DB::table('uuid')->where('name', $player->name)->value('uuid');
                         if ($uuid) {
-                            $playerData['uuid'] = $uuid;
+                            // 格式化 UUID 为 8-4-4-4-12 形式
+                            $formattedUuid = substr($uuid, 0, 8) . '-'
+                                           . substr($uuid, 8, 4) . '-'
+                                           . substr($uuid, 12, 4) . '-'
+                                           . substr($uuid, 16, 4) . '-'
+                                           . substr($uuid, 20);
+                            $playerData['uuid'] = $formattedUuid;
                         }
                     }
 
