@@ -1,2 +1,4 @@
+title: 授权认证服务
+description: 为第三方应用提供 OAuth, OIDC 和 SAML 认证服务
 user-menu: 应用授权管理
 admin-menu: AuthService 应用管理

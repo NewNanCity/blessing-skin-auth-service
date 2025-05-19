@@ -1,2 +1,4 @@
+title: AuthService
+description: Provides OAuth, OIDC, and SAML authentication services for third-party applications
 user-menu: Application Authorizations
 admin-menu: AuthService Applications Management
