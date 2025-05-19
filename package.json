@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "description": "BlessingSkin\\AuthService::general.description",
   "author": "Ke Wang",
-  "url": "",
+  "url": "https://github.com/NewNanCity/blessing-skin-auth-service",
   "namespace": "BlessingSkin\\AuthService",
   "require": {
     "blessing-skin-server": "^6"
