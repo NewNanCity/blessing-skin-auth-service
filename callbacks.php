@@ -13,6 +13,7 @@ return [
         if (!Schema::hasTable('oauth_clients')) {
             Schema::create('oauth_clients', function (Blueprint $table) {
                 $table->increments('id');
+                $table->integer('user_id')->nullable()->index(); // 添加user_id字段以兼容Laravel Passport
                 $table->string('name');
                 $table->string('client_id', 100)->unique();
                 $table->string('client_secret', 100);
@@ -21,6 +22,13 @@ return [
                 $table->boolean('revoked')->default(false);
                 $table->timestamps();
             });
+        } else {
+            // 如果表已存在，检查是否需要添加user_id字段
+            if (!Schema::hasColumn('oauth_clients', 'user_id')) {
+                Schema::table('oauth_clients', function (Blueprint $table) {
+                    $table->integer('user_id')->nullable()->index()->after('id');
+                });
+            }
         }
 
         // 创建 OAuth 授权码表

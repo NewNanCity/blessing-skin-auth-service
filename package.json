@@ -1,7 +1,7 @@
 {
   "name": "blessing-skin-auth-service",
   "title": "BlessingSkin\\AuthService::general.title",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "BlessingSkin\\AuthService::general.description",
   "author": "Ke Wang",
   "url": "https://github.com/NewNanCity/blessing-skin-auth-service",
